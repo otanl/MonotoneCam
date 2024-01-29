@@ -13,6 +13,7 @@
 		45A7544C2B6789F200A989FE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45A7544B2B6789F200A989FE /* Preview Assets.xcassets */; };
 		45A754532B678C5600A989FE /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754522B678C5600A989FE /* CameraView.swift */; };
 		45A754552B678CC800A989FE /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754542B678CC800A989FE /* CameraViewController.swift */; };
+		45A754592B67FAE200A989FE /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754582B67FAE200A989FE /* PreviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		45A7544B2B6789F200A989FE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		45A754522B678C5600A989FE /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		45A754542B678CC800A989FE /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		45A754582B67FAE200A989FE /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			isa = PBXGroup;
 			children = (
 				45A754442B6789F100A989FE /* MonotoneCamApp.swift */,
+				45A754582B67FAE200A989FE /* PreviewView.swift */,
 				45A754462B6789F100A989FE /* ContentView.swift */,
 				45A754542B678CC800A989FE /* CameraViewController.swift */,
 				45A754522B678C5600A989FE /* CameraView.swift */,
@@ -143,6 +146,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45A754592B67FAE200A989FE /* PreviewView.swift in Sources */,
 				45A754532B678C5600A989FE /* CameraView.swift in Sources */,
 				45A754552B678CC800A989FE /* CameraViewController.swift in Sources */,
 				45A754472B6789F100A989FE /* ContentView.swift in Sources */,
