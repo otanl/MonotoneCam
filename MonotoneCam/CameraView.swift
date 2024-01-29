@@ -5,7 +5,8 @@ struct CameraView: View {
     @Binding var isCameraActive: Bool
     @State private var countdownSeconds = 3.0
     @State private var showCountdown = false
-    @State private var isButtonEnabled = true 
+    @State private var isButtonEnabled = true
+    @State private var isButtonPressed = false
 
     var body: some View {
         ZStack {
@@ -33,15 +34,24 @@ struct CameraView: View {
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
                         .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
+                        .padding(20)
+                        .background(Color(.systemGray3))
                         .clipShape(Circle())
+                        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 8, y: 8)
+                        .shadow(color: Color.white.opacity(0.7), radius: 8, x: -3, y: -3)
+                        .scaleEffect(isButtonPressed ? 0.9 : 1.0) // ボタンが押されたときのスケール変更
                 }
                 .padding(.bottom)
                 .disabled(!isButtonEnabled)
+                .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
+                    withAnimation(.easeInOut) {
+                        isButtonPressed = pressing
+                    }
+                }, perform: {})
             }
         }
     }
+
 
     // カウントダウン開始
     func startCountdown() {
@@ -108,13 +118,14 @@ struct CountdownView: View {
             Text("\(Int(countdownSeconds+0.99))")
                 .font(.largeTitle)
                 .foregroundColor(.white)
+                .shadow(color: Color.black.opacity(0.2), radius: 3, x: 3, y: 3)
+                .shadow(color: Color.white.opacity(0.4), radius: 3, x: -0.5, y: -0.5)
         }
         .frame(width: 100, height: 100)
-        .onAppear {
-            if countdownSeconds <= 0 {
-                onCountdownEnd()
-            }
-        }
+        .background(Color(.systemGray3))
+        .clipShape(Circle())
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 8, y: 8)
+        .shadow(color: Color.white.opacity(0.4), radius: 8, x: -3, y: -3)
     }
 }
 
