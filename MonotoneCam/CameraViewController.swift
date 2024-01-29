@@ -1,6 +1,8 @@
 import UIKit
 import AVFoundation
 import Photos
+import CoreImage
+import MobileCoreServices
 
 class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     private var captureSession: AVCaptureSession!
@@ -51,6 +53,26 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
     
+    //モノトーンフィルターの処理
+    func applyMonochromeFilter(to image: UIImage) -> UIImage? {
+        guard let ciImage = CIImage(image: image),
+              let filter = CIFilter(name: "CIPhotoEffectMono") else {
+            return nil
+        }
+        
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        
+        let context = CIContext(options: nil)
+        guard let outputCIImage = filter.outputImage,
+              let cgImage = context.createCGImage(outputCIImage, from: outputCIImage.extent) else {
+            return nil
+        }
+        
+        return UIImage(cgImage: cgImage)
+    }
+    
+
+    
     // 写真撮影が完了した後の処理
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
@@ -58,13 +80,42 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             return
         }
 
-        // 写真データを取得してライブラリに保存
-        if let imageData = photo.fileDataRepresentation(), let image = UIImage(data: imageData) {
-            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        } else {
+        guard let imageData = photo.fileDataRepresentation(),
+              let ciImage = CIImage(data: imageData),
+              let filter = CIFilter(name: "CIPhotoEffectMono") else {
             print("画像データを取得できませんでした。")
+            return
         }
+
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+
+        let context = CIContext(options: nil)
+        guard let outputCIImage = filter.outputImage,
+              let cgImage = context.createCGImage(outputCIImage, from: outputCIImage.extent),
+              let finalImage = createUIImage(from: cgImage, with: photo.metadata) else {
+            print("画像の加工に失敗しました。")
+            return
+        }
+
+        UIImageWriteToSavedPhotosAlbum(finalImage, nil, nil, nil)
     }
+
+    // CGImageとメタデータを使用してUIImageを生成（向き情報保持のため）
+    func createUIImage(from cgImage: CGImage, with metadata: [String: Any]) -> UIImage? {
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, kUTTypeJPEG, 1, nil) else {
+            return nil
+        }
+        
+        CGImageDestinationAddImage(destination, cgImage, metadata as CFDictionary)
+        
+        guard CGImageDestinationFinalize(destination) else {
+            return nil
+        }
+        
+        return UIImage(data: data as Data)
+    }
+
 
     // ステータスバーを非表示に設定
     override var prefersStatusBarHidden: Bool {

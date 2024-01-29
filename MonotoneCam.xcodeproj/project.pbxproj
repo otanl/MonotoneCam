@@ -283,6 +283,7 @@
 				DEVELOPMENT_TEAM = 3VB5545XX2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラを使用して写真を撮影します。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "撮影した写真をライブラリに保存します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -317,6 +318,7 @@
 				DEVELOPMENT_TEAM = 3VB5545XX2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "カメラを使用して写真を撮影します。";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "撮影した写真をライブラリに保存します。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
