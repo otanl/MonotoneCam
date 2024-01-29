@@ -9,19 +9,13 @@ struct ContentView: View {
 
             Spacer()
 
-            Button(action: {
-                self.isCameraActive = true
-            }) {
-                Image(systemName: "camera.fill")
-                    .font(.largeTitle)
-                    .foregroundColor(.blue)
-                    .padding(.bottom, 50)
-            }
+
         }
     }
 }
 
-
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

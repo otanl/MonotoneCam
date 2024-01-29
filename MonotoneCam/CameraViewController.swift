@@ -9,7 +9,6 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     private var previewLayer: AVCaptureVideoPreviewLayer!
     private let photoOutput = AVCapturePhotoOutput()
 
-    // ビューの読み込み時の設定
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCaptureSession()
@@ -20,28 +19,24 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         captureSession = AVCaptureSession()
         captureSession.beginConfiguration()
 
-        // バックカメラの設定
         guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
               let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice),
               captureSession.canAddInput(videoDeviceInput) else {
-            fatalError("カメラが取得できませんでした。")
+            fatalError("バックカメラが取得できませんでした。")
         }
         captureSession.addInput(videoDeviceInput)
         
-        // 写真出力の設定
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
         }
 
         captureSession.commitConfiguration()
 
-        // プレビューレイヤーを設定して、カメラ映像を表示
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.bounds
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
 
-        // カメラセッションの開始
         DispatchQueue.global(qos: .userInitiated).async {
             self.captureSession.startRunning()
         }
@@ -52,7 +47,6 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         let photoSettings = AVCapturePhotoSettings()
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
-    
     //モノトーンフィルターの処理
     func applyMonochromeFilter(to image: UIImage) -> UIImage? {
         guard let ciImage = CIImage(image: image),
