@@ -11,6 +11,8 @@
 		45A754472B6789F100A989FE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754462B6789F100A989FE /* ContentView.swift */; };
 		45A754492B6789F200A989FE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45A754482B6789F200A989FE /* Assets.xcassets */; };
 		45A7544C2B6789F200A989FE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 45A7544B2B6789F200A989FE /* Preview Assets.xcassets */; };
+		45A754532B678C5600A989FE /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754522B678C5600A989FE /* CameraView.swift */; };
+		45A754552B678CC800A989FE /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A754542B678CC800A989FE /* CameraViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		45A754462B6789F100A989FE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		45A754482B6789F200A989FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		45A7544B2B6789F200A989FE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		45A754522B678C5600A989FE /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		45A754542B678CC800A989FE /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +57,8 @@
 			children = (
 				45A754442B6789F100A989FE /* MonotoneCamApp.swift */,
 				45A754462B6789F100A989FE /* ContentView.swift */,
+				45A754542B678CC800A989FE /* CameraViewController.swift */,
+				45A754522B678C5600A989FE /* CameraView.swift */,
 				45A754482B6789F200A989FE /* Assets.xcassets */,
 				45A7544A2B6789F200A989FE /* Preview Content */,
 			);
@@ -137,6 +143,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				45A754532B678C5600A989FE /* CameraView.swift in Sources */,
+				45A754552B678CC800A989FE /* CameraViewController.swift in Sources */,
 				45A754472B6789F100A989FE /* ContentView.swift in Sources */,
 				45A754452B6789F100A989FE /* MonotoneCamApp.swift in Sources */,
 			);
@@ -280,8 +288,11 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -311,8 +322,11 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

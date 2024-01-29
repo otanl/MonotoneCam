@@ -1,15 +1,23 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        Text("カメラ撮影画面")
-            .padding()
-    }
-}
+    @State private var isCameraActive = false
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+    var body: some View {
+        VStack {
+            CameraView(isCameraActive: $isCameraActive)
+
+            Spacer()
+
+            Button(action: {
+                self.isCameraActive = true
+            }) {
+                Image(systemName: "camera.fill")
+                    .font(.largeTitle)
+                    .foregroundColor(.blue)
+                    .padding(.bottom, 50)
+            }
+        }
     }
 }
 
