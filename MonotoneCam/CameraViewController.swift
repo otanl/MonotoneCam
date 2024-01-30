@@ -12,6 +12,10 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     private var hostingController: UIHostingController<PreviewView>?
     @State private var isPreviewActive = false
 
+    // フラッシュとオートフォーカスの状態を管理する変数
+    var flashMode: AVCaptureDevice.FlashMode = .off
+    var autoFocusEnabled: Bool = true
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCaptureSession()
@@ -29,14 +33,29 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         }
         captureSession.addInput(videoDeviceInput)
 
+        // オートフォーカスの設定
+        if autoFocusEnabled {
+            if videoDevice.isFocusModeSupported(.continuousAutoFocus) {
+                try? videoDevice.lockForConfiguration()
+                videoDevice.focusMode = .continuousAutoFocus
+                videoDevice.unlockForConfiguration()
+            }
+        } else {
+            if videoDevice.isFocusModeSupported(.locked) {
+                try? videoDevice.lockForConfiguration()
+                videoDevice.focusMode = .locked
+                videoDevice.unlockForConfiguration()
+            }
+        }
+
+        captureSession.commitConfiguration()
+
         // AVCapturePhotoOutputの初期化
         photoOutput = AVCapturePhotoOutput()
 
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
         }
-
-        captureSession.commitConfiguration()
 
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.bounds
@@ -51,6 +70,10 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     // 写真撮影の実行
     func capturePhoto() {
         let photoSettings = AVCapturePhotoSettings()
+
+        // フラッシュモードの設定
+        photoSettings.flashMode = flashMode
+
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
 
@@ -100,6 +123,16 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         } else {
             print("向き情報が取得できませんでした。")
         }
+    }
+
+    // フラッシュモードの設定
+    func setFlashMode(_ mode: AVCaptureDevice.FlashMode) {
+        flashMode = mode
+    }
+
+    // オートフォーカスの設定
+    func setAutoFocusEnabled(_ enabled: Bool) {
+        autoFocusEnabled = enabled
     }
 
     // 写真保存後のコールバック
