@@ -118,6 +118,9 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate, Obs
             // 撮影した写真をフォトライブラリに保存
             UIImageWriteToSavedPhotosAlbum(finalImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
             
+            // 画像をDocumentディレクトリに保存する
+            saveImageToDocumentsDirectory(image: finalImage)
+            
 
             // 撮影した写真をPreviewViewに渡して遷移
             let previewView = PreviewView(capturedImage: finalImage, isPreviewActive: $isPreviewActive)
@@ -180,6 +183,24 @@ extension UIImage {
             return rotatedImage ?? self
         }
         return self
+    }
+}
+
+private func saveImageToDocumentsDirectory(image: UIImage) {
+    guard let data = image.jpegData(compressionQuality: 1.0) ?? image.pngData() else {
+        print("画像データの変換に失敗しました。")
+        return
+    }
+
+    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let fileName = "capturedImage_\(Date().timeIntervalSince1970).jpg"
+    let fileURL = documentsDirectory.appendingPathComponent(fileName)
+
+    do {
+        try data.write(to: fileURL, options: .atomic)
+        print("画像を保存しました: \(fileURL)")
+    } catch {
+        print("画像の保存に失敗しました: \(error)")
     }
 }
 
