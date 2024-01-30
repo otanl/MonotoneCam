@@ -3,19 +3,18 @@ import AVFoundation
 
 struct CameraView: View {
     @Binding var isCameraActive: Bool
+    @StateObject private var cameraViewController = CameraViewController()
     @State private var countdownSeconds = 3.0
     @State private var showCountdown = false
     @State private var isButtonEnabled = true
     @State private var flashEnabled = false
     @State private var autoFocusEnabled = true
-    @State private var showFlashMenu = false
-    @State private var showFocusMenu = false
-    
+    @State private var isCameraFlipped = false
+
     var body: some View {
-        GeometryReader { geometry in 
+        GeometryReader { geometry in
             ZStack {
-                // カメラプレビュー
-                CameraPreview(isCameraActive: $isCameraActive, flashEnabled: $flashEnabled, autoFocusEnabled: $autoFocusEnabled)
+                CameraPreview(cameraViewController: cameraViewController, isCameraActive: $isCameraActive)
                     .edgesIgnoringSafeArea(.all)
 
                 VStack {
@@ -23,34 +22,13 @@ struct CameraView: View {
                         Spacer()
 
                         // フラッシュメニュー
-                        Menu {
-                            Button("オフ") {
-                                flashEnabled = false
-                            }
-                            Button("オン") {
-                                flashEnabled = true
-                            }
-                        } label: {
-                            Label("フラッシュ", systemImage: "bolt.fill")
-                                .font(.system(size: 14))
-                                .foregroundColor(flashEnabled ? .white : .gray)
-                        }
-                        .padding()
+                        flashMenu
 
                         // オートフォーカスメニュー
-                        Menu {
-                            Button("オン") {
-                                autoFocusEnabled = true
-                            }
-                            Button("オフ") {
-                                autoFocusEnabled = false
-                            }
-                        } label: {
-                            Label("AF", systemImage: "camera.metering.center.weighted")
-                                .font(.system(size: 14))
-                                .foregroundColor(autoFocusEnabled ? .white : .gray)
-                        }
-                        .padding()
+                        autoFocusMenu
+
+                        // カメラの映像反転ボタン
+                        cameraFlipMenu
 
                         Spacer()
                     }
@@ -66,38 +44,108 @@ struct CameraView: View {
 
                     // カウントダウン表示
                     if showCountdown {
-                        CountdownView(countdownSeconds: $countdownSeconds) {
-                            // カウントダウン終了後に撮影
-                            capturePhoto()
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(maxHeight: .infinity)
+                        countdownView
                     }
 
                     // 撮影ボタン
-                    Button(action: {
-                        if isButtonEnabled {
-                            showCountdown = true
-                            startCountdown()
-                        }
-                    }) {
-                        Image(systemName: "camera.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
-                            .padding(20)
-                            .background(Color(.systemGray3))
-                            .clipShape(Circle())
-                    }
-                    .padding(.bottom)
-                    .disabled(!isButtonEnabled)
+                    captureButton
                 }
             }
         }
     }
 
+    // フラッシュメニュー
+    var flashMenu: some View {
+        Menu {
+            Button("オフ") {
+                cameraViewController.setFlashMode(.off)
+                flashEnabled = false
+            }
+            Button("オン") {
+                cameraViewController.setFlashMode(.on)
+                flashEnabled = true
+            }
+        } label: {
+            Label("フラッシュ", systemImage: "bolt.fill")
+                .font(.system(size: 14))
+                .foregroundColor(flashEnabled ? .white : .gray)
+        }
+        .padding()
+    }
+
+    // オートフォーカスメニュー
+    var autoFocusMenu: some View {
+        Menu {
+            Button("オン") {
+                cameraViewController.setAutoFocusEnabled(true)
+                autoFocusEnabled = true
+            }
+            Button("オフ") {
+                cameraViewController.setAutoFocusEnabled(false)
+                autoFocusEnabled = false
+            }
+        } label: {
+            Label("AF", systemImage: "camera.metering.center.weighted")
+                .font(.system(size: 14))
+                .foregroundColor(autoFocusEnabled ? .white : .gray)
+        }
+        .padding()
+    }
+
+    // カメラの映像反転ボタン
+    var cameraFlipMenu: some View {
+        Menu {
+            Button("オン") {
+                cameraViewController.setCameraFlipped(true)
+                isCameraFlipped = true
+            }
+            Button("オフ") {
+                cameraViewController.setCameraFlipped(false)
+                isCameraFlipped = false
+            }
+        } label: {
+            Label(isCameraFlipped ? "反転" : "反転", systemImage: isCameraFlipped ? "arrow.triangle.2.circlepath.camera.fill" : "arrow.triangle.2.circlepath.camera")
+                .font(.system(size: 14))
+                .foregroundColor(isCameraFlipped ? .white : .gray)
+        }
+        .padding()
+    }
+
+    // カウントダウン表示
+    var countdownView: some View {
+        CountdownView(countdownSeconds: $countdownSeconds) {
+            capturePhoto()
+        }
+        .frame(maxWidth: .infinity)
+        .frame(maxHeight: .infinity)
+    }
+
+    // 撮影ボタン
+    var captureButton: some View {
+        Button(action: {
+            if isButtonEnabled {
+                prepareForCapture()
+            }
+        }) {
+            Image(systemName: "camera.fill")
+                .font(.largeTitle)
+                .foregroundColor(.white)
+                .padding(20)
+                .background(Color(.systemGray3))
+                .clipShape(Circle())
+        }
+        .padding(.bottom)
+        .disabled(!isButtonEnabled)
+    }
+
+    // 撮影準備
+    func prepareForCapture() {
+        showCountdown = true
+        startCountdown()
+    }
+
     // カウントダウン開始
     func startCountdown() {
-        isCameraActive = false
         isButtonEnabled = false
         countdownSeconds = 3.0
         let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
@@ -105,42 +153,34 @@ struct CameraView: View {
                 countdownSeconds -= 0.1
             } else {
                 timer.invalidate()
-                // カウントダウンが終了した後、撮影を実行する
                 DispatchQueue.main.async {
                     capturePhoto()
                 }
             }
         }
-        // タイマーをRunLoopに追加して実行する
         RunLoop.current.add(timer, forMode: .common)
     }
 
     // 写真を撮影
     func capturePhoto() {
-        isCameraActive = true
+        cameraViewController.capturePhoto()
+        isCameraActive = false
         showCountdown = false
         isButtonEnabled = true
     }
 }
 
 struct CameraPreview: UIViewControllerRepresentable {
+    @ObservedObject var cameraViewController: CameraViewController
     @Binding var isCameraActive: Bool
-    @Binding var flashEnabled: Bool
-    @Binding var autoFocusEnabled: Bool
 
     func makeUIViewController(context: Context) -> CameraViewController {
-        let cameraViewController = CameraViewController()
-        cameraViewController.setFlashMode(flashEnabled ? .on : .off)
-        cameraViewController.setAutoFocusEnabled(autoFocusEnabled)
         return cameraViewController
     }
 
     func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {
-        uiViewController.setFlashMode(flashEnabled ? .on : .off)
-        uiViewController.setAutoFocusEnabled(autoFocusEnabled)
         if isCameraActive {
             uiViewController.capturePhoto()
-            isCameraActive = false
         }
     }
 }

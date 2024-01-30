@@ -5,14 +5,16 @@ import CoreImage
 import MobileCoreServices
 import SwiftUI
 
-class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
+
+class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate, ObservableObject {
+    var onPhotoCaptureCompleted: (() -> Void)?
+    @Published var isCameraFlipped: Bool = false
     private var captureSession: AVCaptureSession!
     private var previewLayer: AVCaptureVideoPreviewLayer!
     private var photoOutput: AVCapturePhotoOutput!
     private var hostingController: UIHostingController<PreviewView>?
     @State private var isPreviewActive = false
 
-    // フラッシュとオートフォーカスの状態を管理する変数
     var flashMode: AVCaptureDevice.FlashMode = .off
     var autoFocusEnabled: Bool = true
 
@@ -70,15 +72,16 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     // 写真撮影の実行
     func capturePhoto() {
         let photoSettings = AVCapturePhotoSettings()
-
-        // フラッシュモードの設定
         photoSettings.flashMode = flashMode
-
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
 
     // 写真撮影が完了した後の処理
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        
+        // デバッグ出力
+        print("Camera is flipped: \(isCameraFlipped)")
+        
         if let error = error {
             print("エラー発生: \(error.localizedDescription)")
             return
@@ -99,24 +102,25 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             print("画像の加工に失敗しました。")
             return
         }
+        
+
 
         // CIImageの向き情報を取得
         if let orientation = photo.metadata[kCGImagePropertyOrientation as String] as? UInt32,
            let uiOrientation = UIImage.Orientation(rawValue: Int(orientation)) {
             // CGImageからUIImageに変換し、向き情報を設定
-            let finalImage = UIImage(cgImage: cgImage, scale: 1.0, orientation: uiOrientation)
+            var finalImage = UIImage(cgImage: cgImage, scale: 1.0, orientation: uiOrientation)
 
-            // 上下反転
-            let flippedImage = finalImage.withHorizontallyFlippedOrientation()
-
-            // 180度回転
-            let rotatedImage = flippedImage.rotate(radians: .pi)
+            if !isCameraFlipped {
+                finalImage = finalImage.withHorizontallyFlippedOrientation().rotate(radians: .pi)
+            }
 
             // 撮影した写真をフォトライブラリに保存
-            UIImageWriteToSavedPhotosAlbum(rotatedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            UIImageWriteToSavedPhotosAlbum(finalImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            
 
             // 撮影した写真をPreviewViewに渡して遷移
-            let previewView = PreviewView(capturedImage: rotatedImage, isPreviewActive: $isPreviewActive)
+            let previewView = PreviewView(capturedImage: finalImage, isPreviewActive: $isPreviewActive)
             let hostingController = UIHostingController(rootView: previewView)
             hostingController.modalPresentationStyle = .fullScreen
             self.present(hostingController, animated: true, completion: nil)
@@ -134,6 +138,14 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     func setAutoFocusEnabled(_ enabled: Bool) {
         autoFocusEnabled = enabled
     }
+    
+    func setCameraFlipped(_ isFlipped: Bool) {
+        self.isCameraFlipped = isFlipped
+        if let connection = previewLayer?.connection, connection.isVideoMirroringSupported {
+            connection.automaticallyAdjustsVideoMirroring = false
+            connection.isVideoMirrored = isFlipped
+        }
+    }
 
     // 写真保存後のコールバック
     @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
@@ -143,11 +155,13 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
             print("写真が正常に保存されました。")
         }
     }
-
+    
+    /*
     // ステータスバーを非表示に設定
     override var prefersStatusBarHidden: Bool {
         return true
     }
+     */
 }
 
 // rotateメソッドの定義
@@ -168,3 +182,4 @@ extension UIImage {
         return self
     }
 }
+
